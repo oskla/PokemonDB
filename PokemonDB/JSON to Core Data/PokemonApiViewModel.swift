@@ -10,7 +10,7 @@ import CoreData
 
 class PokemonApiViewModel: ObservableObject {
     
-    @Published var pokemons: [PokemonAPI] = PokemonAPI.allPokemonsAPI
+    @Published var pokemons: [PokemonJSON] = PokemonJSON.allPokemonsJSON
     
     func saveData(context: NSManagedObjectContext) {
         pokemons.forEach { poke in

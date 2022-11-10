@@ -10,7 +10,7 @@ import CoreData
 
 class CoreDataManager {
     
-    private var pokemons: [PokemonAPI] = PokemonAPI.allPokemonsAPI
+    private var pokemons: [PokemonJSON] = PokemonJSON.allPokemonsJSON
     
     static let shared = CoreDataManager()
 
@@ -29,6 +29,20 @@ class CoreDataManager {
         } catch {
             print("Error when fetching.")
             return []
+        }
+    }
+    
+    func getPokemonByName(name: String) -> [Pokemon] {
+        let request = Pokemon.fetchRequest()
+        request.predicate = NSPredicate(
+            format: "%K == %@", #keyPath(Pokemon.name), name
+        )
+        
+        do {
+            return try viewContext.fetch(request)
+        } catch {
+            print("Error when fetching Pokemon.")
+            return [Pokemon]()
         }
     }
     

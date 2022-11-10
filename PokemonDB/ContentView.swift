@@ -10,53 +10,169 @@ import CoreData
 
 struct ContentView: View {
 
+    @StateObject var customBools = CustomBools(bools: [CustomBool(state: true, name: "fire")])
+    
+    
     @StateObject var pokeVM = PokemonViewModel()
-    @StateObject var pokeApiVM = PokemonApiViewModel()
+    //@StateObject var pokeApiVM = PokemonApiViewModel()
+    @State private var searchBarText = ""
+    @State private var showOnlyFavorites = false
+    @State private var dontShowFire = false
+    @State private var dontShowPoison = false
+    @State private var dontShowWater = false
+    @State private var dontShowElectric = false
+    @State private var dontShowPsychic = false
+    @State private var dontShowNormal = false
+    @State private var dontShowGround = false
+    @State private var dontShowFlying = false
+    @State private var dontShowFairy = false
+    @State private var dontShowOther = false
+    
 
+    
+    var filteredPokemons: [PokemonModel] {
+        var result = pokeVM.pokemonModelList
+        
+        if showOnlyFavorites {result = result.filter {$0.isFav}}
+        if dontShowFire {result = result.filter {$0.type != "fire"}}
+        if dontShowPoison {result = result.filter {$0.type != "poison"}}
+        if dontShowWater {result = result.filter {$0.type != "water"}}
+        if dontShowElectric {result = result.filter {$0.type != "electric"}}
+        if dontShowPsychic {result = result.filter {$0.type != "psychic"}}
+        if dontShowNormal {result = result.filter {$0.type != "normal"}}
+        if dontShowGround {result = result.filter {$0.type != "ground"}}
+        if dontShowFlying {result = result.filter {$0.type != "flying"}}
+        if dontShowFairy {result = result.filter {$0.type != "fairy"}}
+//        if dontShowOther {result = result.filter {["fire","poison","water", "electric","psychic","normal","ground","flying","fairy"].contains($0.type)}}
+        if dontShowOther {result = result.filter {!["fighting","bug","rock","grass","ice","steel","dragon"].contains($0.type)}}
+        
+        
+        
+        if searchBarText == "" {
+            return result
+        }
+        return result.filter {
+            $0.name.lowercased().contains(searchBarText.lowercased())
+        }
+    }
     
     var body: some View {
         NavigationView {
             
             VStack {
-                List() {
-                    ForEach(pokeVM.pokemonModelList) { pokemon in
-                        Text(pokemon.name)
+                HStack(spacing: 50) {
+                    Button(action: {setBools(string: "All")}, label: {Label("All", systemImage: "capsule.fill")})
+                    Button(action: {setBools(string: "None")}, label: {Label("None", systemImage: "capsule")})
+                    Button(action: {showOnlyFavorites = !showOnlyFavorites}) {Label("Favorites", systemImage: "star.fill")}
+                }
+                HStack {
+                    ToggleButton(onColor: Color(.systemRed), isOn: !dontShowFire, type: "Fire", function: {dontShowFire.toggle()}).id("fire")
+                    ToggleButton(onColor: Color(.systemGreen), isOn: !dontShowPoison, type: "Poison", function: {dontShowPoison.toggle()})
+                    ToggleButton(onColor: Color(.systemBlue), isOn: !dontShowWater, type: "Water", function: {dontShowWater.toggle()})
+                    ToggleButton(onColor: Color(.systemYellow), isOn: !dontShowElectric, type: "Electric", function: {dontShowElectric.toggle()})
+                    ToggleButton(onColor: Color(.systemPurple), isOn: !dontShowPsychic, type: "Psychic", function: {dontShowPsychic.toggle()})
+                }
+                .environmentObject(customBools)
+                HStack {
+                    ToggleButton(onColor: Color(.systemOrange), isOn: !dontShowNormal, type: "Normal", function: {dontShowNormal.toggle()})
+                    ToggleButton(onColor: Color(.systemBrown), isOn: !dontShowGround, type: "Ground", function: {dontShowGround.toggle()})
+                    ToggleButton(onColor: Color(.systemBlue), isOn: !dontShowFlying, type: "Flying", function: {dontShowFlying.toggle()})
+                    ToggleButton(onColor: Color(.systemPink), isOn: !dontShowFairy, type: "Fairy", function: {dontShowFairy.toggle()})
+                    ToggleButton(onColor: Color(.systemIndigo), isOn: !dontShowOther, type: "Other", function: {dontShowOther.toggle()})
+
+                }
+                .environmentObject(customBools)
+                List { //pokeVM.pokemonModelList
+                    ForEach(filteredPokemons) { pokemon in
+                        NavigationLink(destination: PokemonDetailsView(pokemon: pokemon)) {
+                            
+                            HStack {
+                                VStack(alignment: .leading, spacing: 5) {
+                                    HStack {
+                                        Text(pokemon.name.capitalized)
+                                            .font(.title)
+                                        if pokemon.isFav {
+                                            Image(systemName: "star.fill")
+                                                .foregroundColor(.yellow)
+                                        }
+                                    }
+                                    HStack {
+                                        Text(pokemon.type.capitalized)
+                                            .italic()
+                                        Capsule()
+                                            .foregroundColor(pokemon.typeColor)
+                                            .frame(width: 20, height: 10)
+                                    }
+                                    Text(pokemon.description)
+                                        .font(.caption)
+                                        .lineLimit(2)
+                                }
+                                
+                                Spacer()
+                                
+                                Image(pokemon.name)
+                                    .resizable()
+                                    .interpolation(.none)
+                                    .scaledToFit()
+                                    .frame(width: 100, height: 100)
+                            }
+                        }
+                        .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                            Button(action: {pokeVM.addFavorite(pokemon: pokemon)}) {
+                                Image(systemName: "star")
+                            }
+                            .tint(.yellow)
+                        }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(action: {pokeVM.addFavorite(pokemon: pokemon)}) {
+                                Image(systemName: "star")
+                            }
+                            .tint(.yellow)
+                        }
                     }
                 }
-            }.onAppear {
-                //pokeVM.deleteAll()
-//                pokeApiVM.saveData(context: CoreDataManager.shared.viewContext)
-                //pokeVM.getAllPokemons()
-                pokeVM.getAllPokemonModels()
+                .navigationTitle("Pokémon")
+                .searchable(text: $searchBarText)
+//                .onAppear {
+//                    //pokeVM.deleteAll()
+//                    //pokeApiVM.saveData(context: CoreDataManager.shared.viewContext)
+//                    //pokeVM.getAllPokemons()
+//                    //pokeVM.getAllPokemonModels()
+//                }
             }
             
-            
-//            if results.isEmpty {
-//                Text("Core data empty.")
-//            } else {
-//                List {
-//                    ForEach(results, id: \.name) { poke in
-//                        if let pokeName = poke.name {
-//                            Text("\(pokeName)")
-//                        } else {
-//                            Text("No name")
-//                        }
-//
-//                    }
-//                }
-//            }
-//            List {
-//                ForEach(pokemons, id: \.name) { poke in
-//                    Text("\(poke.name)")
-//                }
-                
-            
-//            .onAppear {
-//                pokes.saveData(context: CoreDataManager.shared.viewContext)
-//            }
         }
-        
     }
+    
+    func setBools(string: String) {
+        switch string {
+        case "All":
+            dontShowFire = false
+            dontShowPoison = false
+            dontShowWater = false
+            dontShowElectric = false
+            dontShowPsychic = false
+            dontShowNormal = false
+            dontShowGround = false
+            dontShowFlying = false
+            dontShowFairy = false
+            dontShowOther = false
+        case "None":
+            dontShowFire = true
+            dontShowPoison = true
+            dontShowWater = true
+            dontShowElectric = true
+            dontShowPsychic = true
+            dontShowNormal = true
+            dontShowGround = true
+            dontShowFlying = true
+            dontShowFairy = true
+            dontShowOther = true
+        default:
+            print("Wrong text input.")
+        }
+    }
+    
 }
 
 struct ContentView_Previews: PreviewProvider {

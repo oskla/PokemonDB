@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import CoreData
 
-struct PokemonAPI: Codable, Identifiable {
+struct PokemonJSON: Codable, Identifiable {
     let attack, defense: Int
     let description: String
     let evolutionChain: [EvolutionChain]?
@@ -28,8 +28,8 @@ struct PokemonAPI: Codable, Identifiable {
         case altDefense = "defense:"
     }
     
-    static let allPokemonsAPI: [PokemonAPI] = Bundle.main.decode(file: "pokemons.json")
-    static let samplePokemonAPI: PokemonAPI = allPokemonsAPI[0]
+    static let allPokemonsJSON: [PokemonJSON] = Bundle.main.decode(file: "pokemons.json")
+    static let samplePokemonJSON: PokemonJSON = allPokemonsJSON[0]
 }
 
 struct EvolutionChain: Codable {

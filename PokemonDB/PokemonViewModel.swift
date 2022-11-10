@@ -14,11 +14,16 @@ class PokemonViewModel: ObservableObject {
     @Published var pokemonList = [Pokemon]()
     @Published var pokemonModelList = [PokemonModel]()
     
+    init() {
+        getAllPokemonModels()
+    }
+    
     func deletePokemon(pokemon: Pokemon) {
         CoreDataManager.shared.viewContext.delete(pokemon)
         save()
     }
     
+    // Was used when testing initial core data DB.
     func deleteAll() {
         pokemonList.forEach { poke in
             CoreDataManager.shared.viewContext.delete(poke)
@@ -26,6 +31,7 @@ class PokemonViewModel: ObservableObject {
         }
     }
     
+    // Was used when initializing core data DB from data in JSON-format.
     func getAllPokemons() {
         pokemonList = CoreDataManager.shared.getAllPokemonsFromCoreData()
     }
@@ -37,18 +43,34 @@ class PokemonViewModel: ObservableObject {
         }
     }
     
+    func addFavorite(pokemon: PokemonModel) {
+        if let poke = CoreDataManager.shared.getPokemonByName(name: pokemon.name).first {
+            poke.favorite.toggle()
+        }
+        save()
+        getAllPokemonModels()
+    }
+    
+//    func filterPokemons(searchBarText: String) -> [PokemonModel] {
+//        if searchBarText == "" {
+//            return pokemonModelList
+//        }
+//        return pokemonModelList.filter {
+//            $0.name.lowercased().contains(searchBarText.lowercased())
+//        }
+//    }
+    
+    let SAMPLE_POKEMON = PokemonModel(isFav: false, id: 0, name: "Bulbasaur", imageURL: "", type: "poison", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation...", attack: 35, defense: 50, height: 10, weight: 88)
+    
     func save() {
         
         CoreDataManager.shared.save()
         
-        //getAllPokemons()
-        
     }
     
 }
-//Identifiable, Decodable
+
 struct PokemonModel: Identifiable {
-    //let pokeID = UUID()
     var isFav: Bool
     
     let id: Int
@@ -62,44 +84,29 @@ struct PokemonModel: Identifiable {
     let height: Int
     let weight: Int
     
-//    enum CodingKeys: String, CodingKey {
-//        case id
-//        case name
-//        case imageURL
-//        case type
-//        case description = "descript"
-//        case attack
-//        case defense
-//        case height
-//        case weight
-//        case isFav = "favorite"
-//    }
-//
-//    var typeColor: Color {
-//        switch type {
-//        case "fire":
-//            return Color(.systemRed)
-//        case "poison":
-//            return Color(.systemGreen)
-//        case "water":
-//            return Color(.systemBlue)
-//        case "electric":
-//            return Color(.systemYellow)
-//        case "psychic":
-//            return Color(.systemPurple)
-//        case "normal":
-//            return Color(.systemOrange)
-//        case "ground":
-//            return Color(.systemBrown)
-//        case "flying":
-//            return Color(.systemBlue)
-//        case "fairy":
-//            return Color(.systemPink)
-//        default:
-//            return Color(.systemIndigo)
-//        }
-//    }
-    
-//    init() {}
+    var typeColor: Color {
+        switch type {
+        case "fire":
+            return Color(.systemRed)
+        case "poison":
+            return Color(.systemGreen)
+        case "water":
+            return Color(.systemBlue)
+        case "electric":
+            return Color(.systemYellow)
+        case "psychic":
+            return Color(.systemPurple)
+        case "normal":
+            return Color(.systemOrange)
+        case "ground":
+            return Color(.systemBrown)
+        case "flying":
+            return Color(.systemBlue)
+        case "fairy":
+            return Color(.systemPink)
+        default:
+            return Color(.systemIndigo)
+        }
+    }
     
 }
