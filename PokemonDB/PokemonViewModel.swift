@@ -51,15 +51,6 @@ class PokemonViewModel: ObservableObject {
         getAllPokemonModels()
     }
     
-//    func filterPokemons(searchBarText: String) -> [PokemonModel] {
-//        if searchBarText == "" {
-//            return pokemonModelList
-//        }
-//        return pokemonModelList.filter {
-//            $0.name.lowercased().contains(searchBarText.lowercased())
-//        }
-//    }
-    
     let SAMPLE_POKEMON = PokemonModel(isFav: false, id: 0, name: "Bulbasaur", imageURL: "", type: "poison", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation...", attack: 35, defense: 50, height: 10, weight: 88)
     
     func save() {

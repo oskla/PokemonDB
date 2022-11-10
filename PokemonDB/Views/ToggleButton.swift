@@ -46,6 +46,7 @@ struct ToggleButton: View {
         }
         .onTapGesture {
             function()
+            
             //isOn.toggle()
             let customBool = customBools.bools.first(where: {$0.name == type.lowercased()})
             customBool!.toggle()
