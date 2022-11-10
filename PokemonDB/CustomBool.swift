@@ -19,6 +19,10 @@ class CustomBool: Identifiable {
     func toggle() {
         state = !state
     }
+    
+    func setState(bool: Bool) {
+        state = bool
+    }
 }
 
 @MainActor class CustomBools: ObservableObject {

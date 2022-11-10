@@ -17,7 +17,7 @@ struct ToggleButton: View {
     
         
     var body: some View {
-        let customBool = customBools.bools.first(where: {$0.name == "fire"})?.state
+        let customBool = customBools.bools.first(where: {$0.name == type.lowercased()})?.state
 
         VStack {
             if customBool! {
@@ -25,15 +25,15 @@ struct ToggleButton: View {
                     RoundedRectangle(cornerRadius: 20)
                         .foregroundColor(onColor)
                     .frame(width: 70, height: 20)
-                    Text("\(customBools.bools.count)").font(.system(.body).bold()).foregroundColor(.white)
+                    Text("\(type)").font(.system(.body).bold()).foregroundColor(.white)
+                    // + "\(customBools.bools.count)"
                 }
-                Button {
-                    let customBool = CustomBool(state: true, name: "Test")
-                    customBools.bools.append(customBool)
-                } label: {
-                    Label("Add",systemImage: "plus")
-                }
-                Text("")
+//                Button {
+//                    let customBool = CustomBool(state: true, name: "Test")
+//                    customBools.bools.append(customBool)
+//                } label: {
+//                    Label("Add",systemImage: "plus")
+//                }
             } else {
                 ZStack {
                     RoundedRectangle(cornerRadius: 20)
@@ -47,7 +47,7 @@ struct ToggleButton: View {
         .onTapGesture {
             function()
             //isOn.toggle()
-            let customBool = customBools.bools.first(where: {$0.name == "fire"})
+            let customBool = customBools.bools.first(where: {$0.name == type.lowercased()})
             customBool!.toggle()
         }
         
